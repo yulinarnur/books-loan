@@ -1,0 +1,12 @@
+GET http://localhost:5000/users
+
+###
+POST http://localhost:5000/register
+Content-Type: application/json
+
+{
+    "fullname": "Yulinar Nur Rahmawati",
+    "username": "yulinarnur",
+    "password": "12345678",
+    "confPassword": "12345678"
+}
