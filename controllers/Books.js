@@ -1,8 +1,16 @@
 import Books from "../models/BookModel.js";
+import { Sequelize } from "sequelize";
+
+const { Op } = Sequelize;
 
 export const getBooks = async (req, res) => {
     try {
         const books = await Books.findAll({
+            where: {
+                stock: {
+                    [Op.ne]: 0
+                }
+            },
             attributes: ['code', 'title', 'author', 'stock']
         });
         res.status(200).json(books);
@@ -32,5 +40,25 @@ export const createBook = async (req, res) => {
         });
     } catch (error) {
         res.status(400).json({msg: error.message});
+    }
+}
+
+export const getBooksById = async (req, res) => {
+    try{
+        const book = await Books.findOne({
+            where: {
+                id: req.params.id,
+                stock: {
+                    [Op.ne]: 0
+                }
+            },
+            attributes: ['code', 'title', 'author', 'stock']
+        });
+        if (!book) {
+            return res.status(404).json({ msg: "Buku tidak ditemukan atau stok kosong" });
+        }
+        res.status(200).json(book);
+    } catch (error){
+        res.status(500).json({ msg: error.message });
     }
 }
