@@ -62,3 +62,32 @@ export const getBooksById = async (req, res) => {
         res.status(500).json({ msg: error.message });
     }
 }
+
+export const updateBook = async (req, res) => {
+    const {code, title, author, stock} = req.body;
+    try{
+        const bookUpdate = await Books.update({
+            code, title, author, stock
+        },
+        {
+            where:{
+                id: req.params.id
+            }
+        });
+
+        if (bookUpdate === 0) {
+            return res.status(404).json({ msg: "Buku tidak ditemukan" });
+        }
+
+        const updatedBook = await Books.findOne({
+            where: {
+                id: req.params.id,
+            },
+            attributes: ['code', 'title', 'author', 'stock']
+        });
+        res.status(200).json({ msg: "Berhasil mengupdate informasi buku", dataBuku: updatedBook });
+
+    } catch (error){
+        res.status(500).json({ msg: error.message });
+    }
+}
