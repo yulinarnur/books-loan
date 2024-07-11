@@ -76,3 +76,24 @@ export const Login = async(req, res) => {
         res.status(500).json({ msg: error.message });
     }
 }
+
+export const Logout = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) return res.sendStatus(204);
+
+    const users = await Users.findAll({
+        where: {
+        refresh_token: refreshToken,
+        },
+    });
+    if (users.length === 0) return res.sendStatus(204);
+    const userId = users[0].id;
+    await Users.update({ refresh_token: null },{
+        where: {
+            id: userId,
+        },
+    });
+
+    res.clearCookie('refreshToken');
+    return res.status(200).json({ msg: "OK! Anda berhasil logout"});;
+}
