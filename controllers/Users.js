@@ -1,5 +1,6 @@
 import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const getUser = async (req, res) => {
     try {
@@ -30,5 +31,46 @@ export const Register = async(req, res) => {
         res.status(201).json({msg: "Register Berhasil"});
     } catch (error) {
         res.status(400).json({msg: error.message});
+    }
+}
+
+export const Login = async(req, res) => {
+    try {
+        const user = await Users.findOne({
+            where: {
+                username: req.body.username
+            }
+        });
+        if (!user) return res.status(404).json({ msg: "Username tidak ditemukan" });
+
+        const match = await bcrypt.compare(req.body.password, user.password);
+        if (!match) return res.status(400).json({ msg: "Wrong Password" });   
+        const uuid = user.uuid;
+        const fullname = user.fullname;
+        const username = user.username;
+        const accessToken = jwt.sign(
+            { uuid, fullname, username }, process.env.ACCESS_TOKEN_SECRET, {
+              expiresIn: "1h",
+            }
+        );
+        const refreshToken = jwt.sign(
+            { uuid, fullname, username }, process.env.REFRESH_TOKEN_SECRET, {
+              expiresIn: "1d",
+            }
+        );
+        await Users.update({refresh_token: refreshToken }, {
+            where: {
+                uuid: uuid,
+            }
+        });
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000
+        });
+        res.json({ accessToken });
+
+    } catch (error) {
+        res.status(500).json({ msg: error.message });
     }
 }
