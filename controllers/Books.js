@@ -91,3 +91,27 @@ export const updateBook = async (req, res) => {
         res.status(500).json({ msg: error.message });
     }
 }
+
+export const deleteBook = async (req, res) => {
+    try {
+        const book = await Books.findOne({
+            where: {
+                id: req.params.id,
+            }
+        });
+
+        if (!book) {
+            return res.status(404).json({ msg: "Buku tidak ditemukan" });
+        }
+
+        await Books.destroy({
+            where: {
+                id: req.params.id
+            }
+        })
+
+        res.status(200).json({msg: "Buku berhasil dihapus"});
+    } catch (error){
+        res.status(500).json({ msg: error.message });
+    }
+}
