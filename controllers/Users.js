@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 
 export const getUser = async (req, res) => {
     try {
-        const users = await Users.findAll();
+        const users = await Users.findAll({
+            attributes: ['uuid', 'fullname', 'username']
+        });
         res.status(200).json(users);
     } catch(error){
         res.status(500).json({msg: error.message});
@@ -50,7 +52,7 @@ export const Login = async(req, res) => {
         const username = user.username;
         const accessToken = jwt.sign(
             { uuid, fullname, username }, process.env.ACCESS_TOKEN_SECRET, {
-              expiresIn: "1h",
+              expiresIn: "30s",
             }
         );
         const refreshToken = jwt.sign(

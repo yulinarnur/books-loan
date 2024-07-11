@@ -1,5 +1,5 @@
 GET http://localhost:5000/users
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzc2N2NlMTMtYThjNS00YzAxLTlkMjktOTdjMzkwNDZhYmFkIiwiZnVsbG5hbWUiOiJZdWxpbmFyIE51ciBSYWhtYXdhdGkiLCJ1c2VybmFtZSI6Inl1bGluYXJudXIiLCJpYXQiOjE3MjA2NjgxNTQsImV4cCI6MTcyMDY2ODE4NH0.qnS4q-T-bBnBkktMtDXgLmGTJj9xZC89u-MnVov82gc
 ###
 POST http://localhost:5000/register
 Content-Type: application/json
@@ -19,3 +19,7 @@ Content-Type: application/json
     "username": "yulinarnur",
     "password": "12345678"
 }
+
+###
+GET http://localhost:5000/token
+
