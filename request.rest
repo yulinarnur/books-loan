@@ -1,12 +1,13 @@
 GET http://localhost:5000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzc2N2NlMTMtYThjNS00YzAxLTlkMjktOTdjMzkwNDZhYmFkIiwiZnVsbG5hbWUiOiJZdWxpbmFyIE51ciBSYWhtYXdhdGkiLCJ1c2VybmFtZSI6Inl1bGluYXJudXIiLCJpYXQiOjE3MjA2Njg2MzAsImV4cCI6MTcyMDY2ODY2MH0.BtfTz542kafsD4S5OSYWzkVLp7ab0lYCx8HuEHl5cXA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwidXVpZCI6ImUzN2VlNGU3LTQ5Y2UtNDg5Zi04YTUzLTU2YjBmNjJhMzEyZSIsImZ1bGxuYW1lIjoiSW50YW4iLCJ1c2VybmFtZSI6ImludGFuIiwiaWF0IjoxNzIwNjczOTU0LCJleHAiOjE3MjA2Nzc1NTR9.72FgUIsUp3AdycbuY5VO3U0kzLLhNItD7imRLLFAvnI
+
 ###
 POST http://localhost:5000/register
 Content-Type: application/json
 
 {
-    "fullname": "Yulinar Nur Rahmawati",
-    "username": "yulinarnur",
+    "fullname": "Intan",
+    "username": "intan",
     "password": "12345678",
     "confPassword": "12345678"
 }
@@ -16,12 +17,15 @@ POST http://localhost:5000/login
 Content-Type: application/json
 
 {
-    "username": "yulinarnur",
+    "username": "intan",
     "password": "12345678"
 }
 
 ###
 GET http://localhost:5000/token
+
+###
+GET http://localhost:5000/currentUser
 
 ###
 DELETE http://localhost:5000/logout

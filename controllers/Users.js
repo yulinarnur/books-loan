@@ -46,17 +46,18 @@ export const Login = async(req, res) => {
         if (!user) return res.status(404).json({ msg: "Username tidak ditemukan" });
 
         const match = await bcrypt.compare(req.body.password, user.password);
-        if (!match) return res.status(400).json({ msg: "Wrong Password" });   
+        if (!match) return res.status(400).json({ msg: "Wrong Password" });  
+        const id = user.id; 
         const uuid = user.uuid;
         const fullname = user.fullname;
         const username = user.username;
         const accessToken = jwt.sign(
-            { uuid, fullname, username }, process.env.ACCESS_TOKEN_SECRET, {
-              expiresIn: "30s",
+            { id, uuid, fullname, username }, process.env.ACCESS_TOKEN_SECRET, {
+              expiresIn: "1h",
             }
         );
         const refreshToken = jwt.sign(
-            { uuid, fullname, username }, process.env.REFRESH_TOKEN_SECRET, {
+            { id, uuid, fullname, username }, process.env.REFRESH_TOKEN_SECRET, {
               expiresIn: "1d",
             }
         );
@@ -76,6 +77,26 @@ export const Login = async(req, res) => {
         res.status(500).json({ msg: error.message });
     }
 }
+
+export const getCurrentUser = async (req, res) => {
+    console.log()
+    try {
+        const user = await Users.findOne({
+            attributes: ["uuid", "fullname", "username"],
+            where: {
+                id: req.userId, 
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ msg: "User tidak ditemukan" });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Gagal mengambil informasi user" });
+    }
+};
 
 export const Logout = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
