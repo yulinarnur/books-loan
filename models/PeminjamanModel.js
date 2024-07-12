@@ -10,16 +10,14 @@ const Peminjaman = db.define('peminjamans', {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-            notEmpty: true,
-            len: [3, 100]
+            notEmpty: true
         }
     },
     borrower_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-            notEmpty: true,
-            len: [3, 100]
+            notEmpty: true
         }
     },
     loan_date: {
