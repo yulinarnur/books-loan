@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
-import Peminjaman from "./PeminjamanModel.js";
+import BorrowedBooks from "./BorrowedBooksModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -12,7 +12,7 @@ const Penalty = db.define('penalty', {
             notEmpty: true
         }
     },
-    peminjaman_id: {
+    borrower_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
@@ -38,7 +38,7 @@ const Penalty = db.define('penalty', {
     freezeTableName: true,
 });
 
-Peminjaman.hasMany(Penalty, { foreignKey: 'peminjaman_id' });
-Penalty.belongsTo(Peminjaman, { foreignKey: 'peminjaman_id' });
+BorrowedBooks.hasMany(Penalty, { foreignKey: 'borrower_id' });
+Penalty.belongsTo(BorrowedBooks, { foreignKey: 'borrower_id' });
 
 export default Penalty;

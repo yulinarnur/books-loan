@@ -23,7 +23,7 @@ export const createBook = async (req, res) => {
     const {code, title, author, stock} = req.body;
     const existingCode = await Books.findOne({ where: { code: code } });
     if (existingCode) {
-        return res.status(409).json({msg: "Username sudah digunakan"});
+        return res.status(409).json({msg: "Kode buku sudah digunakan"});
     }
     if (stock <= 0) return res.status(400).json({msg: "Jumlah buku tidak boleh kosong"});
     

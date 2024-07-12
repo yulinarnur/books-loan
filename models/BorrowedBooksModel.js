@@ -5,7 +5,7 @@ import Books from "./BookModel.js";
 
 const { DataTypes } = Sequelize;
 
-const Peminjaman = db.define('peminjamans', {
+const BorrowedBooks = db.define('borrowed_books', {
     book_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -48,9 +48,9 @@ const Peminjaman = db.define('peminjamans', {
     freezeTableName: true,
 });
 
-Books.hasMany(Peminjaman, { foreignKey: 'book_id' });
-Users.hasMany(Peminjaman, { foreignKey: 'borrower_id' });
-Peminjaman.belongsTo(Books, { foreignKey: 'book_id' });
-Peminjaman.belongsTo(Users, { foreignKey: 'borrower_id' });
+Books.hasMany(BorrowedBooks, { foreignKey: 'book_id' });
+Users.hasMany(BorrowedBooks, { foreignKey: 'borrower_id' });
+BorrowedBooks.belongsTo(Books, { foreignKey: 'book_id' });
+BorrowedBooks.belongsTo(Users, { foreignKey: 'borrower_id' });
 
-export default Peminjaman;
+export default BorrowedBooks;

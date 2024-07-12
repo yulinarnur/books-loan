@@ -1,11 +1,10 @@
-import Peminjaman from "../models/PeminjamanModel.js";
+import BorrowedBooks from "../models/BorrowedBooksModel.js";
 import Books from "../models/BookModel.js";
-import Users from "../models/UserModel.js";
 import Penalty from "../models/PenaltyModel.js";
 
-export const getPeminjamans = async (req, res) => {
+export const getBorrowedBooks = async (req, res) => {
     try {
-        const books = await Peminjaman.findAll({
+        const books = await BorrowedBooks.findAll({
             attributes: ['book_id', 'borrower_id']
         });
         res.status(200).json(books);
@@ -14,7 +13,7 @@ export const getPeminjamans = async (req, res) => {
     }
 }
 
-export const createPinjam = async (req, res) => {
+export const createBorrowedBooks = async (req, res) => {
     const { code, title } = req.body;
     const borrower_id = req.userId;
 
@@ -35,14 +34,14 @@ export const createPinjam = async (req, res) => {
             
         }
 
-        const peminjamId = await Peminjaman.count({
+        const borrowerId = await BorrowedBooks.count({
             where: {
                 borrower_id: borrower_id,
                 status: "aktif"
             }
         })
 
-        if (peminjamId >= 2) return res.status(403).json({msg: "Anggota tidak boleh meminjam lebih dari 2 buku"})
+        if (borrowerId >= 2) return res.status(403).json({msg: "Anggota tidak boleh meminjam lebih dari 2 buku"})
 
         const book = await Books.findOne({
             where: {
@@ -71,7 +70,7 @@ export const createPinjam = async (req, res) => {
         const returnDate = new Date(newLoanDate);
         returnDate.setDate(returnDate.getDate() + 7);
 
-        const newPinjaman = await Peminjaman.create({
+        const newLoan = await BorrowedBooks.create({
             book_id: book.id,
             borrower_id: borrower_id,
             loan_date: newLoanDate,
@@ -83,15 +82,15 @@ export const createPinjam = async (req, res) => {
         res.status(201).json({
             msg: "Buku berhasil dipinjam",
             data_peminjaman: {
-                id: newPinjaman.id,
+                id: newLoan.id,
                 data_buku: {
                     id: bookDetails.id,
                     code: bookDetails.code,
                     title: bookDetails.title,
                     author: bookDetails.author
                 },
-                loan_date: newPinjaman.loan_date,
-                return_date: newPinjaman.return_date
+                loan_date: newLoan.loan_date,
+                return_date: newLoan.return_date
             }
         });
 
@@ -100,12 +99,12 @@ export const createPinjam = async (req, res) => {
     }
 }
 
-export const pengembalian = async (req, res) => {
+export const bookReturn = async (req, res) => {
     const { code, title } = req.body;
     const borrower_id = req.userId;
 
     try {
-        const peminjaman = await Peminjaman.findOne({
+        const datasBorrowedBooks = await BorrowedBooks.findOne({
             where: {
                 borrower_id: borrower_id,
                 status: 'aktif',
@@ -121,49 +120,49 @@ export const pengembalian = async (req, res) => {
              }]
         });
         
-        if (!peminjaman) return res.status(404).json({ msg: "Data buku peminjaman tidak ditemukan" });
+        if (!datasBorrowedBooks) return res.status(404).json({ msg: "Data buku peminjaman tidak ditemukan" });
         
         const borrowerReturn = new Date()
-        if (borrowerReturn > peminjaman.return_date){
+        if (borrowerReturn > datasBorrowedBooks.return_date){
             const sanctionEndDate = new Date();
             sanctionEndDate.setDate(sanctionEndDate.getDate() + 3);
 
             await Penalty.create({
                 user_id: borrower_id,
-                peminjaman_id: peminjaman.id,
+                borrower_id: datasBorrowedBooks.id,
                 is_sanctioned: 1,
                 end_date_sanctioned: sanctionEndDate
             })
         }
             
-        await Peminjaman.update(
+        await BorrowedBooks.update(
             {
                 status: 'dikembalikan',
                 borrower_return_date: borrowerReturn 
             },
             {
                 where: {
-                    id: peminjaman.id
+                    id: datasBorrowedBooks.id
                 }
             }
         );
 
-        const book = await Books.findOne({ where: { id: peminjaman.book_id } });
+        const book = await Books.findOne({ where: { id: datasBorrowedBooks.book_id } });
         await Books.update(
             { stock: book.stock + 1 },
-            { where: { id: peminjaman.book_id }}
+            { where: { id: datasBorrowedBooks.book_id }}
         )
         res.status(200).json({
             msg: "Buku berhasil dikembalikan",
             book_return: {
-                id: peminjaman.id,
+                id: datasBorrowedBooks.id,
                 status: 'dikembalikan',
                 borrower_return_date: borrowerReturn,
                 book: {
-                    id: peminjaman.book.id,
-                    code: peminjaman.book.code,
-                    title: peminjaman.book.title,
-                    author: peminjaman.book.author,
+                    id: datasBorrowedBooks.book.id,
+                    code: datasBorrowedBooks.book.code,
+                    title: datasBorrowedBooks.book.title,
+                    author: datasBorrowedBooks.book.author,
                     stock: book.stock + 1
                 }
             }
