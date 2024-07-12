@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
 import BorrowedBooks from "./BorrowedBooksModel.js";
+import Users from "./UserModel.js";
 
 const { DataTypes } = Sequelize;
 
@@ -40,5 +41,7 @@ const Penalty = db.define('penalty', {
 
 BorrowedBooks.hasMany(Penalty, { foreignKey: 'borrower_id' });
 Penalty.belongsTo(BorrowedBooks, { foreignKey: 'borrower_id' });
+Users.hasMany(Penalty, { foreignKey: 'user_id' });
+Penalty.belongsTo(Users, { foreignKey: 'user_id' });
 
 export default Penalty;

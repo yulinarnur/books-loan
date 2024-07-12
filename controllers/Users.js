@@ -1,15 +1,32 @@
 import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import BorrowedBooks from "../models/BorrowedBooksModel.js";
+import Sequelize from "sequelize";
+import Books from "../models/BookModel.js";
 
 export const getUser = async (req, res) => {
     try {
         const users = await Users.findAll({
-            attributes: ['uuid', 'fullname', 'username']
+            attributes: ['uuid', 'fullname', 'username', [Sequelize.fn('COUNT', Sequelize.col('borrowed_books.id')), 'borrowedTotal']],
+            include: [
+                {
+                    model: BorrowedBooks,
+                    attributes: ['id', 'loan_date', 'status', 'return_date', 'borrower_return_date'],
+                    where: { status: 'aktif' },
+                    required: false,
+                    include: [
+                        {
+                            model: Books,
+                            attributes: ['title', 'author'] 
+                        }
+                    ]
+                }
+            ]
         });
         res.status(200).json(users);
-    } catch(error){
-        res.status(500).json({msg: error.message});
+    } catch (error) {
+        res.status(500).json({ msg: error.message });
     }
 }
 

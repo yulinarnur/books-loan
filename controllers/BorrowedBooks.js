@@ -1,11 +1,28 @@
 import BorrowedBooks from "../models/BorrowedBooksModel.js";
 import Books from "../models/BookModel.js";
 import Penalty from "../models/PenaltyModel.js";
+import Users from "../models/UserModel.js";
 
 export const getBorrowedBooks = async (req, res) => {
     try {
         const books = await BorrowedBooks.findAll({
-            attributes: ['book_id', 'borrower_id']
+            attributes: ['id', 'loan_date', 'status', 'return_date', 'borrower_return_date'],
+            include: [
+                {
+                    model: Books,
+                    attributes: ['title', 'author']
+                },
+                {
+                    model: Users,
+                    attributes: ['fullname'],
+                    include: [
+                        {
+                            model: Penalty,
+                            attributes: ['is_sanctioned', 'end_date_sanctioned']
+                        }
+                    ]
+                }
+            ]
         });
         res.status(200).json(books);
     } catch(error){
@@ -90,7 +107,8 @@ export const createBorrowedBooks = async (req, res) => {
                     author: bookDetails.author
                 },
                 loan_date: newLoan.loan_date,
-                return_date: newLoan.return_date
+                return_date: newLoan.return_date,
+                borrower_return_date: newLoan.borrower_return_date ? newLoan.borrower_return_date : null
             }
         });
 
