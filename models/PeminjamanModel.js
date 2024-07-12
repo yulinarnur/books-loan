@@ -40,6 +40,10 @@ const Peminjaman = db.define('peminjamans', {
         type: DataTypes.DATE,
         allowNull: true
     },
+    borrower_return_date: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
 }, {
     freezeTableName: true,
 });

@@ -74,3 +74,73 @@ export const createPinjam = async (req, res) => {
         res.status(500).json({ msg: error.message });
     }
 }
+
+export const pengembalian = async (req, res) => {
+    const { code, title } = req.body;
+    const borrower_id = req.userId;
+
+    try {
+        const peminjaman = await Peminjaman.findOne({
+            where: {
+                borrower_id: borrower_id,
+                status: 'aktif',
+            },
+            include: [{ 
+                model: Books, 
+                as: 'book',
+                where: {
+                    code: code,
+                    title: title
+                }
+
+             }]
+        });
+        
+        if (!peminjaman) return res.status(404).json({ msg: "Data buku peminjaman tidak ditemukan" });
+        
+        const borrowerReturn = new Date()
+        if (borrowerReturn > peminjaman.return_date)
+            await Users.update(
+                { is_sanctioned: 1 }, {
+                    where: {
+                        id: borrower_id}
+                })
+
+        await Peminjaman.update(
+            {
+                status: 'dikembalikan',
+                borrower_return_date: borrowerReturn 
+            },
+            {
+                where: {
+                    id: peminjaman.id
+                }
+            }
+        );
+
+        const book = await Books.findOne({ where: { id: peminjaman.book_id } });
+        await Books.update(
+            { stock: book.stock + 1 },
+            { where: { id: peminjaman.book_id }}
+        )
+        res.status(200).json({
+            msg: "Buku berhasil dikembalikan",
+            book_return: {
+                id: peminjaman.id,
+                status: 'dikembalikan',
+                borrower_return_date: borrowerReturn,
+                book: {
+                    id: peminjaman.book.id,
+                    code: peminjaman.book.code,
+                    title: peminjaman.book.title,
+                    author: peminjaman.book.author,
+                    stock: book.stock + 1
+                }
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({ msg: error.message });
+    }
+};
+    
