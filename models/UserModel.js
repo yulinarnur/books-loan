@@ -35,6 +35,14 @@ const Users = db.define('users', {
             notEmpty: true
         }
     },
+    is_sanctioned: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            notEmpty: true
+        }
+    },
     refresh_token:{
         type: DataTypes.TEXT
     }
