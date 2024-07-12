@@ -118,7 +118,7 @@ export const createBorrowedBooks = async (req, res) => {
 }
 
 export const bookReturn = async (req, res) => {
-    const { code, title } = req.body;
+    const { code, title, borrower_return_date } = req.body;
     const borrower_id = req.userId;
 
     try {
@@ -140,18 +140,21 @@ export const bookReturn = async (req, res) => {
         
         if (!datasBorrowedBooks) return res.status(404).json({ msg: "Data buku peminjaman tidak ditemukan" });
         
-        const borrowerReturn = new Date()
+        let penalty = null
+        const borrowerReturn = new Date(borrower_return_date);
         if (borrowerReturn > datasBorrowedBooks.return_date){
             const sanctionEndDate = new Date();
             sanctionEndDate.setDate(sanctionEndDate.getDate() + 3);
 
-            await Penalty.create({
+            penalty = await Penalty.create({
                 user_id: borrower_id,
                 borrower_id: datasBorrowedBooks.id,
                 is_sanctioned: 1,
                 end_date_sanctioned: sanctionEndDate
             })
         }
+
+        console.log(borrowerReturn > datasBorrowedBooks.return_date)
             
         await BorrowedBooks.update(
             {
@@ -182,7 +185,11 @@ export const bookReturn = async (req, res) => {
                     title: datasBorrowedBooks.book.title,
                     author: datasBorrowedBooks.book.author,
                     stock: book.stock + 1
-                }
+                },
+                penalty: penalty ? {
+                    is_sanctioned: penalty.is_sanctioned,
+                    end_date_sanctioned: penalty.end_date_sanctioned
+                } : null
             }
         });
 
