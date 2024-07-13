@@ -10,7 +10,7 @@ export const getBorrowedBooks = async (req, res) => {
             include: [
                 {
                     model: Books,
-                    attributes: ['title', 'author']
+                    attributes: ['id','code','title','author','stock']
                 },
                 {
                     model: Users,

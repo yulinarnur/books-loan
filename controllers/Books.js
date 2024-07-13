@@ -11,7 +11,7 @@ export const getBooks = async (req, res) => {
                     [Op.ne]: 0
                 }
             },
-            attributes: ['code', 'title', 'author', 'stock']
+            attributes: ['id','code', 'title', 'author', 'stock']
         });
         res.status(200).json(books);
     } catch(error){
