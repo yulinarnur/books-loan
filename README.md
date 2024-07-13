@@ -26,3 +26,8 @@ Berikut adalah relasi atau hubungan antar tabel.
 - Periksa anggota
     - [ ]  Menampilkan semua anggota yang ada
     - [ ]  Jumlah buku yang sedang dipinjam oleh setiap anggota
+ 
+## Dokumentasi API
+Swagger :
+  ![image](https://github.com/user-attachments/assets/d1941165-3e07-40d4-abbb-f4e12039c834)
+
